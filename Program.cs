@@ -1,9 +1,44 @@
-﻿using System.Text;
+﻿
+using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using InTheHand.Net.Sockets;
 
+Console.WriteLine("*** 出席管理システム ATTENDIVE デバイス検知システム ***");
 
-static Task EnumerateDevices()
+// 授業のUUIDを記述
+// ULIDの形式で行われる
+Console.WriteLine("[*] 授業のUUIDを入力してください。");
+Console.Write(">>> ");
+string uuid = Console.ReadLine();
+
+// バリデーション
+if (string.IsNullOrEmpty(uuid))
+{
+    Console.WriteLine("[-] UUIDが空です。");
+    return;
+}
+
+// ULIDの仕様に準拠しているかどうかを確認
+// 正規表現を用いて確認
+// 26文字の大文字英数字であることを確認
+if (!Regex.IsMatch(uuid, @"^[A-Z0-9]{26}$"))
+{
+    Console.WriteLine("[-] UUIDが不正です。");
+    return;
+}
+
+Console.WriteLine("[+] UUIDが正常に入力されました。");
+Console.WriteLine("[*] 入力されたUUID: " + uuid);
+
+// EnumerateDevicesメソッドを一度だけ並行で実行
+Task.Run(() => EnumerateDevices(uuid));
+
+Console.WriteLine("[*] Enterキーを押すと終了します。");
+Console.ReadLine();
+Console.WriteLine("[*] 終了します。ご利用ありがとうございました。");
+
+static Task EnumerateDevices(string uuid)
 {
 
     // 無限ループでデバイスを列挙
@@ -26,19 +61,21 @@ static Task EnumerateDevices()
         }
 
         // データを送信
-        SendDevicesData(knownDeviceAddresses).Wait();
+        SendDevicesData(knownDeviceAddresses, uuid).Wait();
     }
 }
 
-static async Task SendDevicesData(List<string> knownDeviceAddresses)
+static async Task SendDevicesData(List<string> knownDeviceAddresses, string uuid)
 {
 
-    HttpClient httpClient = new HttpClient();
-    string graphqlUrl = "https://pbl-gairon-test.calloc134personal.workers.dev/attendances-endpoint";
+    HttpClient http_client = new HttpClient();
+    string endpoint_url = "https://webhook.site/6d570f9e-a1b3-488d-b308-45e153a8e0e8";
 
 
     var payload = new
     {
+        // 授業のUUIDをJSONに含める
+        lesson_uuid = uuid,
         // 検知されたデバイスのアドレスをJSONに含める
         device_ids = knownDeviceAddresses
     };
@@ -48,7 +85,7 @@ static async Task SendDevicesData(List<string> knownDeviceAddresses)
 
     // JSON APIにPOSTリクエストを送信
     var content = new StringContent(json, Encoding.UTF8, "application/json");
-    var response = await httpClient.PostAsync(graphqlUrl, content);
+    var response = await http_client.PostAsync(endpoint_url, content);
 
     // リクエストが成功したかどうかを確認
     if (response.IsSuccessStatusCode)
@@ -61,10 +98,3 @@ static async Task SendDevicesData(List<string> knownDeviceAddresses)
     }
 }
 
-Console.WriteLine("*** 出席管理システム ATTENDIVE デバイス検知システム ***");
-
-// EnumerateDevicesメソッドを一度だけ並行で実行
-Task.Run(() => EnumerateDevices());
-
-Console.WriteLine("[*] Enterキーを押すと終了します。");
-Console.ReadLine();
