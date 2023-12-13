@@ -1,0 +1,48 @@
+# dotnet build and debugging artifacts
+bin/
+obj/
+Debug/
+Release/
+
+# Visual Studio Code specific files
+.vscode/
+
+# Visual Studio specific files
+*.sln
+*.user
+*.userprefs
+.cache/
+.vs/
+.Packages/
+
+# NuGet dependencies
+packages/
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NUNIT
+*.VisualState.xml
+TestResult.xml
+nunit-*.xml
+
+# Build Results of an ATL Project
+[Dd]ebugPS/
+[Rr]eleasePS/
+dlldata.c
+
+# BenchmarkDotNet artifacts
+BenchmarkDotNet.Artifacts/
