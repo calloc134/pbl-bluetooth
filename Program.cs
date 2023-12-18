@@ -69,7 +69,7 @@ static async Task SendDevicesData(List<string> knownDeviceAddresses, string uuid
 {
 
     HttpClient http_client = new HttpClient();
-    string endpoint_url = "https://webhook.site/6d570f9e-a1b3-488d-b308-45e153a8e0e8";
+    string endpoint_url = "https://pbl-gairon-test.calloc134personal.workers.dev/attendances-endpoint";
 
 
     var payload = new
